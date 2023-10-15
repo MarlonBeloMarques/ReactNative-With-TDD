@@ -13,6 +13,7 @@ describe('Presentation: TransferMoney', () => {
         recipientUserAccountName={''}
         recipientAgency={''}
         recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
       />,
     );
 
@@ -34,6 +35,7 @@ describe('Presentation: TransferMoney', () => {
         recipientUserAccountName={''}
         recipientAgency={''}
         recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
       />,
     );
 
@@ -64,6 +66,7 @@ describe('Presentation: TransferMoney', () => {
         recipientUserAccountName={''}
         recipientAgency={''}
         recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
       />,
     );
 
@@ -86,6 +89,7 @@ describe('Presentation: TransferMoney', () => {
         recipientUserAccountName={''}
         recipientAgency={''}
         recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
       />,
     );
 
@@ -105,6 +109,7 @@ describe('Presentation: TransferMoney', () => {
         recipientUserAccountName={nameFaker}
         recipientAgency={agencyFaker}
         recipientCurrentAccount={currentAccountFaker}
+        profilePhotoOfRecipientsAccount={''}
       />,
     );
 
@@ -120,6 +125,26 @@ describe('Presentation: TransferMoney', () => {
     expect(currentAccountLabel.props.children).toEqual('Current Account');
     expect(currentAccount.props.children).toEqual(currentAccountFaker);
   });
+
+  test('should show the recipients photo profile of account with success', () => {
+    const photoProfile = faker.image.avatar();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={photoProfile}
+      />,
+    );
+
+    expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
+      uri: photoProfile,
+    });
+  });
 });
 
 type Props = {
@@ -130,6 +155,7 @@ type Props = {
   recipientUserAccountName: string;
   recipientAgency: string;
   recipientCurrentAccount: string;
+  profilePhotoOfRecipientsAccount: string;
 };
 
 const TransferMoney = ({
@@ -140,6 +166,7 @@ const TransferMoney = ({
   recipientAgency,
   recipientCurrentAccount,
   recipientUserAccountName,
+  profilePhotoOfRecipientsAccount,
 }: Props) => {
   return (
     <View>
@@ -157,7 +184,7 @@ const TransferMoney = ({
         nameAccountUser={recipientUserAccountName}
         agency={recipientAgency}
         currentAccount={recipientCurrentAccount}
-        photoProfileOfAccount={''}
+        photoProfileOfAccount={profilePhotoOfRecipientsAccount}
       />
     </View>
   );
