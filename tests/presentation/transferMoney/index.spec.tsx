@@ -1,11 +1,16 @@
 import {render} from '@testing-library/react-native';
-import {Text, View} from 'react-native';
+import {Image, Text, View} from 'react-native';
 import {faker} from '@faker-js/faker';
 
 describe('Presentation: TransferMoney', () => {
   test('should show title correctly', () => {
     const {getByTestId} = render(
-      <TransferMoney nameAccountUser="" agency={''} currentAccount={''} />,
+      <TransferMoney
+        nameAccountUser=""
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+      />,
     );
 
     const title = getByTestId('title_id');
@@ -22,6 +27,7 @@ describe('Presentation: TransferMoney', () => {
         nameAccountUser={nameFaker}
         agency={agencyFaker}
         currentAccount={currentAccountFaker}
+        photoProfileOfAccount={''}
       />,
     );
 
@@ -37,15 +43,40 @@ describe('Presentation: TransferMoney', () => {
     expect(currentAccountLabel.props.children).toEqual('Current Account');
     expect(currentAccount.props.children).toEqual(currentAccountFaker);
   });
+
+  test('should show photo profile of account with success', () => {
+    const nameFaker = faker.person.firstName();
+    const agencyFaker = faker.finance.accountNumber();
+    const currentAccountFaker = faker.finance.accountNumber();
+    const photoProfile = faker.image.avatar();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={nameFaker}
+        agency={agencyFaker}
+        currentAccount={currentAccountFaker}
+        photoProfileOfAccount={photoProfile}
+      />,
+    );
+
+    expect(getByTestId('photo_profile_of_account_id').props.source).toEqual({
+      uri: photoProfile,
+    });
+  });
 });
 
 type Props = {
   nameAccountUser: string;
   agency: string;
   currentAccount: string;
+  photoProfileOfAccount: string;
 };
 
-const TransferMoney = ({nameAccountUser, agency, currentAccount}: Props) => {
+const TransferMoney = ({
+  nameAccountUser,
+  agency,
+  currentAccount,
+  photoProfileOfAccount,
+}: Props) => {
   return (
     <View>
       <Text testID="title_id">Transfer</Text>
@@ -53,6 +84,7 @@ const TransferMoney = ({nameAccountUser, agency, currentAccount}: Props) => {
         nameAccountUser={nameAccountUser}
         agency={agency}
         currentAccount={currentAccount}
+        photoProfileOfAccount={photoProfileOfAccount}
       />
     </View>
   );
@@ -62,14 +94,20 @@ type AccountCardProps = {
   nameAccountUser: string;
   agency: string;
   currentAccount: string;
+  photoProfileOfAccount: string;
 };
 
 const AccountCard = ({
   nameAccountUser,
   agency,
   currentAccount,
+  photoProfileOfAccount,
 }: AccountCardProps) => (
   <View>
+    <Image
+      testID="photo_profile_of_account_id"
+      source={{uri: photoProfileOfAccount}}
+    />
     <Text testID="name_account_user_id">{nameAccountUser}</Text>
     <Text testID="agency_label_id">{'Agency'}</Text>
     <Text testID="agency_id">{agency}</Text>
