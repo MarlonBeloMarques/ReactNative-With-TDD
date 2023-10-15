@@ -185,6 +185,28 @@ describe('Presentation: TransferMoney', () => {
 
     expect(recipientAccountChange).toHaveBeenCalled();
   });
+
+  test('should show the change button with correct text', () => {
+    const photoProfile = faker.image.avatar();
+    const recipientAccountChange = jest.fn();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={photoProfile}
+        recipientAccountChange={recipientAccountChange}
+      />,
+    );
+
+    const changeText = getByTestId('recipient_account_change_text_id');
+
+    expect(changeText.props.children).toEqual('Change');
+  });
 });
 
 type Props = {
@@ -263,8 +285,9 @@ const AccountCard = ({
     {id === '2' && (
       <TouchableOpacity
         testID="recipient_account_change_id"
-        onPress={recipientAccountChange}
-      />
+        onPress={recipientAccountChange}>
+        <Text testID="recipient_account_change_text_id">{'Change'}</Text>
+      </TouchableOpacity>
     )}
   </View>
 );
