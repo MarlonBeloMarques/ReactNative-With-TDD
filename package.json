@@ -1,0 +1,58 @@
+{
+  "name": "TransferMoney",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest --passWithNoTests --coverage --no-cache --runInBand",
+    "test:staged": "jest --passWithNoTests -- --findRelatedTests --no-cache --runInBand",
+    "lint": "eslint '*/**/*.{js,jsx,ts,tsx}' --fix",
+    "pretty": "prettier --config ./.prettierrc.js --write \"*/**/*.{js,jsx,ts,tsx,json}\"",
+    "precommit": "lint-staged",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*.ts?(x)": [
+      "yarn lint",
+      "yarn pretty",
+      "yarn test:staged"
+    ]
+  },
+  "dependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "react": "18.2.0",
+    "react-native": "0.72.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@testing-library/react-native": "^12.3.0",
+    "@tsconfig/react-native": "^3.0.0",
+    "@types/jest": "^29.5.5",
+    "@types/react": "^18.0.24",
+    "@types/react-test-renderer": "^18.0.0",
+    "babel-jest": "^29.2.1",
+    "cz-conventional-changelog": "3.3.0",
+    "eslint": "^8.19.0",
+    "husky": "^8.0.3",
+    "jest": "^29.2.1",
+    "lint-staged": "13.0.3",
+    "metro-react-native-babel-preset": "0.76.8",
+    "prettier": "^2.4.1",
+    "react-test-renderer": "18.2.0",
+    "typescript": "4.8.4"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
