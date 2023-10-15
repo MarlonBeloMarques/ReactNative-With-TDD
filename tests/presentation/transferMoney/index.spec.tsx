@@ -62,6 +62,23 @@ describe('Presentation: TransferMoney', () => {
       uri: photoProfile,
     });
   });
+
+  test('should show "to" text correctly', () => {
+    const nameFaker = faker.person.firstName();
+    const agencyFaker = faker.finance.accountNumber();
+    const currentAccountFaker = faker.finance.accountNumber();
+    const photoProfile = faker.image.avatar();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={nameFaker}
+        agency={agencyFaker}
+        currentAccount={currentAccountFaker}
+        photoProfileOfAccount={photoProfile}
+      />,
+    );
+
+    expect(getByTestId('to_id').props.children).toEqual('To');
+  });
 });
 
 type Props = {
@@ -86,6 +103,7 @@ const TransferMoney = ({
         currentAccount={currentAccount}
         photoProfileOfAccount={photoProfileOfAccount}
       />
+      <Text testID="to_id">To</Text>
     </View>
   );
 };
