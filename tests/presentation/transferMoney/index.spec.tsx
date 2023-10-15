@@ -1,5 +1,5 @@
-import {render} from '@testing-library/react-native';
-import {Image, Text, View} from 'react-native';
+import {fireEvent, render} from '@testing-library/react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {faker} from '@faker-js/faker';
 
 describe('Presentation: TransferMoney', () => {
@@ -14,6 +14,9 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={''}
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -36,6 +39,9 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={''}
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -67,6 +73,9 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={''}
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -90,6 +99,9 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={''}
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -110,6 +122,9 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={agencyFaker}
         recipientCurrentAccount={currentAccountFaker}
         profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -138,12 +153,37 @@ describe('Presentation: TransferMoney', () => {
         recipientAgency={''}
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={photoProfile}
+        recipientAccountChange={function (): {} {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
     expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
       uri: photoProfile,
     });
+  });
+
+  test('should call recipientAccountChange when press the change button', () => {
+    const photoProfile = faker.image.avatar();
+    const recipientAccountChange = jest.fn();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={photoProfile}
+        recipientAccountChange={recipientAccountChange}
+      />,
+    );
+
+    fireEvent.press(getByTestId('recipient_account_change_id'));
+
+    expect(recipientAccountChange).toHaveBeenCalled();
   });
 });
 
@@ -156,6 +196,7 @@ type Props = {
   recipientAgency: string;
   recipientCurrentAccount: string;
   profilePhotoOfRecipientsAccount: string;
+  recipientAccountChange: () => {};
 };
 
 const TransferMoney = ({
@@ -167,6 +208,7 @@ const TransferMoney = ({
   recipientCurrentAccount,
   recipientUserAccountName,
   profilePhotoOfRecipientsAccount,
+  recipientAccountChange,
 }: Props) => {
   return (
     <View>
@@ -185,6 +227,7 @@ const TransferMoney = ({
         agency={recipientAgency}
         currentAccount={recipientCurrentAccount}
         photoProfileOfAccount={profilePhotoOfRecipientsAccount}
+        recipientAccountChange={recipientAccountChange}
       />
     </View>
   );
@@ -196,6 +239,7 @@ type AccountCardProps = {
   agency: string;
   currentAccount: string;
   photoProfileOfAccount: string;
+  recipientAccountChange?: () => {};
 };
 
 const AccountCard = ({
@@ -204,6 +248,7 @@ const AccountCard = ({
   agency,
   currentAccount,
   photoProfileOfAccount,
+  recipientAccountChange,
 }: AccountCardProps) => (
   <View>
     <Image
@@ -215,5 +260,11 @@ const AccountCard = ({
     <Text testID={`agency_${id}_id`}>{agency}</Text>
     <Text testID={`current_account_label_${id}_id`}>{'Current Account'}</Text>
     <Text testID={`current_account_${id}_id`}>{currentAccount}</Text>
+    {id === '2' && (
+      <TouchableOpacity
+        testID="recipient_account_change_id"
+        onPress={recipientAccountChange}
+      />
+    )}
   </View>
 );
