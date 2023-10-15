@@ -1242,6 +1242,11 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.51.0.tgz"
   integrity sha512-HxjQ8Qn+4SI3/AFv6sOrDB+g6PpUTDwSJiQqOrnneEk8L71161srI9gjzzZvYVbzHiVg/BvcH95+cK/zfIt4pg==
 
+"@faker-js/faker@^8.2.0":
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-8.2.0.tgz#d4656d2cb485fe6ec4e7b340da9f16fac2c36c4a"
+  integrity sha512-VacmzZqVxdWdf9y64lDOMZNDMM/FQdtM9IsaOPKOm2suYwEatb8VkdHqOzXcDnZbk7YDE2BmsJmy/2Hmkn563g==
+
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.npmjs.org/@hapi/hoek/-/hoek-9.3.0.tgz"
