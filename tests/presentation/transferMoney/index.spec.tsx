@@ -1,6 +1,12 @@
 import React from 'react';
 import {fireEvent, render} from '@testing-library/react-native';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {faker} from '@faker-js/faker';
 
 const makeAccount = (): Account => {
@@ -20,6 +26,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     const title = getByTestId('title_id');
@@ -35,6 +42,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount,
+      isLoading: true,
     });
 
     expect(getByTestId('name_account_user_1_id').props.children).toEqual(
@@ -60,6 +68,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount,
+      isLoading: true,
     });
 
     expect(getByTestId('photo_profile_of_account_1_id').props.source).toEqual({
@@ -74,6 +83,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     expect(getByTestId('to_id').props.children).toEqual('To');
@@ -87,6 +97,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     expect(getByTestId('name_account_user_2_id').props.children).toEqual(
@@ -113,6 +124,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
@@ -128,6 +140,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange,
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     fireEvent.press(getByTestId('recipient_account_change_id'));
@@ -142,6 +155,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     const changeText = getByTestId('recipient_account_change_text_id');
@@ -157,6 +171,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     const amountToTransfer = getByTestId('amount_to_transfer_id');
@@ -174,6 +189,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
@@ -190,6 +206,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     fireEvent.press(getByTestId('send_money_id'));
@@ -205,11 +222,28 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
+      isLoading: true,
     });
 
     const sendMoneyText = getByTestId('send_money_text_id');
 
     expect(sendMoneyText.props.children).toEqual('Send money');
+  });
+
+  test('should show loading animation when isLoading is true', () => {
+    const isLoading = true;
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
+      isLoading,
+    });
+
+    const loadingAnimation = getByTestId('loading_animation_id');
+
+    expect(loadingAnimation).toBeTruthy();
   });
 });
 
@@ -219,6 +253,7 @@ type SutProps = {
   recipientAccountChange: () => void;
   recipientAccount: Account;
   senderAccount: Account;
+  isLoading: boolean;
 };
 
 const makeSut = ({
@@ -227,6 +262,7 @@ const makeSut = ({
   recipientAccountChange,
   recipientAccount,
   senderAccount,
+  isLoading,
 }: SutProps) => {
   const sut = render(
     <TransferMoney
@@ -235,6 +271,7 @@ const makeSut = ({
       recipientAccountChange={recipientAccountChange}
       amountToTransfer={amountToTransfer}
       sendMoney={sendMoney}
+      isLoading={isLoading}
     />,
   );
 
@@ -247,6 +284,7 @@ type Props = {
   recipientAccountChange: () => void;
   amountToTransfer: string;
   sendMoney: (recipientAccount: Account) => void;
+  isLoading: boolean;
 };
 
 type Account = {
@@ -262,9 +300,11 @@ const TransferMoney = ({
   recipientAccountChange,
   amountToTransfer,
   sendMoney,
+  isLoading,
 }: Props) => {
   return (
     <View>
+      {isLoading && <ActivityIndicator testID="loading_animation_id" />}
       <Text testID="title_id">Transfer</Text>
       <AccountCard
         id="1"
