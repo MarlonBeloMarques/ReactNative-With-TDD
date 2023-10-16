@@ -26,7 +26,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     const title = getByTestId('title_id');
@@ -42,7 +42,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount,
-      isLoading: true,
+      isLoading: false,
     });
 
     expect(getByTestId('name_account_user_1_id').props.children).toEqual(
@@ -68,7 +68,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount,
-      isLoading: true,
+      isLoading: false,
     });
 
     expect(getByTestId('photo_profile_of_account_1_id').props.source).toEqual({
@@ -83,7 +83,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     expect(getByTestId('to_id').props.children).toEqual('To');
@@ -97,7 +97,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     expect(getByTestId('name_account_user_2_id').props.children).toEqual(
@@ -124,7 +124,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
@@ -140,7 +140,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange,
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     fireEvent.press(getByTestId('recipient_account_change_id'));
@@ -155,7 +155,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     const changeText = getByTestId('recipient_account_change_text_id');
@@ -171,7 +171,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     const amountToTransfer = getByTestId('amount_to_transfer_id');
@@ -189,7 +189,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
@@ -206,7 +206,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     fireEvent.press(getByTestId('send_money_id'));
@@ -222,7 +222,7 @@ describe('Presentation: TransferMoney', () => {
       recipientAccountChange: () => {},
       recipientAccount: makeAccount(),
       senderAccount: makeAccount(),
-      isLoading: true,
+      isLoading: false,
     });
 
     const sendMoneyText = getByTestId('send_money_text_id');
@@ -260,6 +260,22 @@ describe('Presentation: TransferMoney', () => {
     const loadingAnimation = queryByTestId('loading_animation_id');
 
     expect(loadingAnimation).not.toBeTruthy();
+  });
+
+  test('should not show the content of screen if isLoading is true', () => {
+    const isLoading = true;
+    const {queryByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
+      isLoading,
+    });
+
+    const content = queryByTestId('content_id');
+
+    expect(content).not.toBeTruthy();
   });
 });
 
@@ -321,30 +337,36 @@ const TransferMoney = ({
   return (
     <View>
       {isLoading && <ActivityIndicator testID="loading_animation_id" />}
-      <Text testID="title_id">Transfer</Text>
-      <AccountCard
-        id="1"
-        nameAccountUser={senderAccount.userName}
-        agency={senderAccount.agency}
-        currentAccount={senderAccount.currentAccount}
-        photoProfileOfAccount={senderAccount.profilePhoto}
-      />
-      <Text testID="to_id">To</Text>
-      <AccountCard
-        id="2"
-        nameAccountUser={recipientAccount.userName}
-        agency={recipientAccount.agency}
-        currentAccount={recipientAccount.currentAccount}
-        photoProfileOfAccount={recipientAccount.profilePhoto}
-        recipientAccountChange={recipientAccountChange}
-      />
-      <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
-      <Text testID="amount_label_to_transfer_id">{'Amount to transfer'}</Text>
-      <TouchableOpacity
-        testID="send_money_id"
-        onPress={() => sendMoney(recipientAccount)}>
-        <Text testID="send_money_text_id">{'Send money'}</Text>
-      </TouchableOpacity>
+      {!isLoading && (
+        <View testID="content_id">
+          <Text testID="title_id">Transfer</Text>
+          <AccountCard
+            id="1"
+            nameAccountUser={senderAccount.userName}
+            agency={senderAccount.agency}
+            currentAccount={senderAccount.currentAccount}
+            photoProfileOfAccount={senderAccount.profilePhoto}
+          />
+          <Text testID="to_id">To</Text>
+          <AccountCard
+            id="2"
+            nameAccountUser={recipientAccount.userName}
+            agency={recipientAccount.agency}
+            currentAccount={recipientAccount.currentAccount}
+            photoProfileOfAccount={recipientAccount.profilePhoto}
+            recipientAccountChange={recipientAccountChange}
+          />
+          <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
+          <Text testID="amount_label_to_transfer_id">
+            {'Amount to transfer'}
+          </Text>
+          <TouchableOpacity
+            testID="send_money_id"
+            onPress={() => sendMoney(recipientAccount)}>
+            <Text testID="send_money_text_id">{'Send money'}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
