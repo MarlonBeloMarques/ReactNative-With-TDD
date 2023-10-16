@@ -19,6 +19,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -45,6 +48,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -80,6 +86,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -107,6 +116,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -131,6 +143,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -163,6 +178,9 @@ describe('Presentation: TransferMoney', () => {
           throw new Error('Function not implemented.');
         }}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -186,6 +204,9 @@ describe('Presentation: TransferMoney', () => {
         profilePhotoOfRecipientsAccount={photoProfile}
         recipientAccountChange={recipientAccountChange}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -209,6 +230,9 @@ describe('Presentation: TransferMoney', () => {
         profilePhotoOfRecipientsAccount={photoProfile}
         recipientAccountChange={recipientAccountChange}
         amountToTransfer={''}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -231,6 +255,9 @@ describe('Presentation: TransferMoney', () => {
         profilePhotoOfRecipientsAccount={''}
         recipientAccountChange={() => {}}
         amountToTransfer={`R$ ${amountToTransferFake}`}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
@@ -255,12 +282,38 @@ describe('Presentation: TransferMoney', () => {
         profilePhotoOfRecipientsAccount={''}
         recipientAccountChange={() => {}}
         amountToTransfer={`R$ ${amountToTransferFake}`}
+        sendMoney={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />,
     );
 
     const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
 
     expect(amountLabelToTransfer.props.children).toEqual(`Amount to transfer`);
+  });
+
+  test('should call sendMoney function when press the send money button', () => {
+    const sendMoney = jest.fn();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={() => {}}
+        amountToTransfer={`R$ `}
+        sendMoney={sendMoney}
+      />,
+    );
+
+    fireEvent.press(getByTestId('send_money_id'));
+
+    expect(sendMoney).toHaveBeenCalled();
   });
 });
 
@@ -275,6 +328,7 @@ type Props = {
   profilePhotoOfRecipientsAccount: string;
   recipientAccountChange: () => void;
   amountToTransfer: string;
+  sendMoney: () => void;
 };
 
 const TransferMoney = ({
@@ -288,6 +342,7 @@ const TransferMoney = ({
   profilePhotoOfRecipientsAccount,
   recipientAccountChange,
   amountToTransfer,
+  sendMoney,
 }: Props) => {
   return (
     <View>
@@ -310,6 +365,7 @@ const TransferMoney = ({
       />
       <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
       <Text testID="amount_label_to_transfer_id">{'Amount to transfer'}</Text>
+      <TouchableOpacity testID="send_money_id" onPress={sendMoney} />
     </View>
   );
 };
