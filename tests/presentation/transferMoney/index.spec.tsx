@@ -17,6 +17,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -42,6 +43,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -76,6 +78,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -102,6 +105,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -125,6 +129,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -156,6 +161,7 @@ describe('Presentation: TransferMoney', () => {
         recipientAccountChange={function (): {} {
           throw new Error('Function not implemented.');
         }}
+        amountToTransfer={''}
       />,
     );
 
@@ -178,6 +184,7 @@ describe('Presentation: TransferMoney', () => {
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={photoProfile}
         recipientAccountChange={recipientAccountChange}
+        amountToTransfer={''}
       />,
     );
 
@@ -200,12 +207,37 @@ describe('Presentation: TransferMoney', () => {
         recipientCurrentAccount={''}
         profilePhotoOfRecipientsAccount={photoProfile}
         recipientAccountChange={recipientAccountChange}
+        amountToTransfer={''}
       />,
     );
 
     const changeText = getByTestId('recipient_account_change_text_id');
 
     expect(changeText.props.children).toEqual('Change');
+  });
+
+  test('should show amount to transfer correctly', () => {
+    const amountToTransferFake = faker.number.int();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={() => {}}
+        amountToTransfer={`R$ ${amountToTransferFake}`}
+      />,
+    );
+
+    const amountToTransfer = getByTestId('amount_to_transfer_id');
+
+    expect(amountToTransfer.props.children).toEqual(
+      `R$ ${amountToTransferFake}`,
+    );
   });
 });
 
@@ -219,6 +251,7 @@ type Props = {
   recipientCurrentAccount: string;
   profilePhotoOfRecipientsAccount: string;
   recipientAccountChange: () => {};
+  amountToTransfer: string;
 };
 
 const TransferMoney = ({
@@ -231,6 +264,7 @@ const TransferMoney = ({
   recipientUserAccountName,
   profilePhotoOfRecipientsAccount,
   recipientAccountChange,
+  amountToTransfer,
 }: Props) => {
   return (
     <View>
@@ -251,6 +285,7 @@ const TransferMoney = ({
         photoProfileOfAccount={profilePhotoOfRecipientsAccount}
         recipientAccountChange={recipientAccountChange}
       />
+      <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
     </View>
   );
 };
