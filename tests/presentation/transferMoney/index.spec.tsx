@@ -277,6 +277,22 @@ describe('Presentation: TransferMoney', () => {
 
     expect(content).not.toBeTruthy();
   });
+
+  test('should show the content of screen if isLoading is false', () => {
+    const isLoading = false;
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
+      isLoading,
+    });
+
+    const content = getByTestId('content_id');
+
+    expect(content).toBeTruthy();
+  });
 });
 
 type SutProps = {
