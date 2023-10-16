@@ -181,19 +181,20 @@ describe('Presentation: TransferMoney', () => {
     expect(amountLabelToTransfer.props.children).toEqual(`Amount to transfer`);
   });
 
-  test('should call sendMoney function when press the send money button', () => {
+  test('should call sendMoney function correctly when press the send money button', () => {
+    const recipientAccount = makeAccount();
     const sendMoney = jest.fn();
     const {getByTestId} = makeSut({
       sendMoney,
       amountToTransfer: '',
       recipientAccountChange: () => {},
-      recipientAccount: makeAccount(),
+      recipientAccount,
       senderAccount: makeAccount(),
     });
 
     fireEvent.press(getByTestId('send_money_id'));
 
-    expect(sendMoney).toHaveBeenCalled();
+    expect(sendMoney).toHaveBeenCalledWith(recipientAccount);
   });
 
   test('should show send money button with correct text', () => {
@@ -245,7 +246,7 @@ type Props = {
   recipientAccount: Account;
   recipientAccountChange: () => void;
   amountToTransfer: string;
-  sendMoney: () => void;
+  sendMoney: (recipientAccount: Account) => void;
 };
 
 type Account = {
@@ -283,7 +284,9 @@ const TransferMoney = ({
       />
       <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
       <Text testID="amount_label_to_transfer_id">{'Amount to transfer'}</Text>
-      <TouchableOpacity testID="send_money_id" onPress={sendMoney}>
+      <TouchableOpacity
+        testID="send_money_id"
+        onPress={() => sendMoney(recipientAccount)}>
         <Text testID="send_money_text_id">{'Send money'}</Text>
       </TouchableOpacity>
     </View>
