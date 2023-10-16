@@ -315,6 +315,29 @@ describe('Presentation: TransferMoney', () => {
 
     expect(sendMoney).toHaveBeenCalled();
   });
+
+  test('should show send money button with correct text', () => {
+    const sendMoney = jest.fn();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={() => {}}
+        amountToTransfer={`R$ `}
+        sendMoney={sendMoney}
+      />,
+    );
+
+    const sendMoneyText = getByTestId('send_money_text_id');
+
+    expect(sendMoneyText.props.children).toEqual('Send money');
+  });
 });
 
 type Props = {
@@ -365,7 +388,9 @@ const TransferMoney = ({
       />
       <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
       <Text testID="amount_label_to_transfer_id">{'Amount to transfer'}</Text>
-      <TouchableOpacity testID="send_money_id" onPress={sendMoney} />
+      <TouchableOpacity testID="send_money_id" onPress={sendMoney}>
+        <Text testID="send_money_text_id">{'Send money'}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
