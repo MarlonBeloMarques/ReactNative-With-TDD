@@ -245,6 +245,22 @@ describe('Presentation: TransferMoney', () => {
 
     expect(loadingAnimation).toBeTruthy();
   });
+
+  test('should not show loading animation when isLoading is false', () => {
+    const isLoading = false;
+    const {queryByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
+      isLoading,
+    });
+
+    const loadingAnimation = queryByTestId('loading_animation_id');
+
+    expect(loadingAnimation).not.toBeTruthy();
+  });
 });
 
 type SutProps = {
