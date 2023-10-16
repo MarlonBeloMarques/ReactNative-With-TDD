@@ -3,20 +3,23 @@ import {fireEvent, render} from '@testing-library/react-native';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {faker} from '@faker-js/faker';
 
+const makeAccount = (): Account => {
+  return {
+    agency: faker.finance.accountNumber(),
+    currentAccount: faker.finance.accountNumber(),
+    profilePhoto: faker.image.avatar(),
+    userName: faker.person.firstName(),
+  };
+};
+
 describe('Presentation: TransferMoney', () => {
   test('should show title correctly', () => {
     const {getByTestId} = makeSut({
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     const title = getByTestId('title_id');
@@ -25,54 +28,42 @@ describe('Presentation: TransferMoney', () => {
   });
 
   test('should show bank account information correctly', () => {
-    const nameFaker = faker.person.firstName();
-    const agencyFaker = faker.finance.accountNumber();
-    const currentAccountFaker = faker.finance.accountNumber();
+    const senderAccount = makeAccount();
     const {getByTestId} = makeSut({
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: agencyFaker,
-      currentAccount: currentAccountFaker,
-      nameAccountUser: nameFaker,
+      recipientAccount: makeAccount(),
+      senderAccount,
     });
 
     expect(getByTestId('name_account_user_1_id').props.children).toEqual(
-      nameFaker,
+      senderAccount.userName,
     );
     expect(getByTestId('agency_label_1_id').props.children).toEqual('Agency');
-    expect(getByTestId('agency_1_id').props.children).toEqual(agencyFaker);
+    expect(getByTestId('agency_1_id').props.children).toEqual(
+      senderAccount.agency,
+    );
     expect(getByTestId('current_account_label_1_id').props.children).toEqual(
       'Current Account',
     );
     expect(getByTestId('current_account_1_id').props.children).toEqual(
-      currentAccountFaker,
+      senderAccount.currentAccount,
     );
   });
 
   test('should show photo profile of account with success', () => {
-    const photoProfile = faker.image.avatar();
+    const senderAccount = makeAccount();
     const {getByTestId} = makeSut({
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: photoProfile,
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount,
     });
 
     expect(getByTestId('photo_profile_of_account_1_id').props.source).toEqual({
-      uri: photoProfile,
+      uri: senderAccount.profilePhoto,
     });
   });
 
@@ -81,68 +72,51 @@ describe('Presentation: TransferMoney', () => {
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     expect(getByTestId('to_id').props.children).toEqual('To');
   });
 
   test('should show the recipients bank account information correctly', () => {
-    const nameFaker = faker.person.firstName();
-    const agencyFaker = faker.finance.accountNumber();
-    const currentAccountFaker = faker.finance.accountNumber();
+    const recipientAccount = makeAccount();
     const {getByTestId} = makeSut({
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: agencyFaker,
-      recipientCurrentAccount: currentAccountFaker,
-      recipientUserAccountName: nameFaker,
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount,
+      senderAccount: makeAccount(),
     });
 
     expect(getByTestId('name_account_user_2_id').props.children).toEqual(
-      nameFaker,
+      recipientAccount.userName,
     );
     expect(getByTestId('agency_label_2_id').props.children).toEqual('Agency');
-    expect(getByTestId('agency_2_id').props.children).toEqual(agencyFaker);
+    expect(getByTestId('agency_2_id').props.children).toEqual(
+      recipientAccount.agency,
+    );
     expect(getByTestId('current_account_label_2_id').props.children).toEqual(
       'Current Account',
     );
     expect(getByTestId('current_account_2_id').props.children).toEqual(
-      currentAccountFaker,
+      recipientAccount.currentAccount,
     );
   });
 
   test('should show the recipients photo profile of account with success', () => {
-    const photoProfile = faker.image.avatar();
+    const recipientAccount = makeAccount();
+
     const {getByTestId} = makeSut({
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: photoProfile,
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount,
+      senderAccount: makeAccount(),
     });
 
     expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
-      uri: photoProfile,
+      uri: recipientAccount.profilePhoto,
     });
   });
 
@@ -152,14 +126,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange,
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     fireEvent.press(getByTestId('recipient_account_change_id'));
@@ -172,14 +140,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney: () => {},
       amountToTransfer: ``,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     const changeText = getByTestId('recipient_account_change_text_id');
@@ -193,14 +155,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney: () => {},
       amountToTransfer: `R$ ${amountToTransferFake}`,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     const amountToTransfer = getByTestId('amount_to_transfer_id');
@@ -216,14 +172,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney: () => {},
       amountToTransfer: `R$ ${amountToTransferFake}`,
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
@@ -237,14 +187,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney,
       amountToTransfer: '',
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     fireEvent.press(getByTestId('send_money_id'));
@@ -258,14 +202,8 @@ describe('Presentation: TransferMoney', () => {
       sendMoney,
       amountToTransfer: '',
       recipientAccountChange: () => {},
-      profilePhotoOfRecipientsAccount: '',
-      recipientAgency: '',
-      recipientCurrentAccount: '',
-      recipientUserAccountName: '',
-      photoProfileOfAccount: '',
-      agency: '',
-      currentAccount: '',
-      nameAccountUser: '',
+      recipientAccount: makeAccount(),
+      senderAccount: makeAccount(),
     });
 
     const sendMoneyText = getByTestId('send_money_text_id');
@@ -278,39 +216,21 @@ type SutProps = {
   sendMoney: () => void;
   amountToTransfer: string;
   recipientAccountChange: () => void;
-  profilePhotoOfRecipientsAccount: string;
-  recipientCurrentAccount: string;
-  recipientAgency: string;
-  recipientUserAccountName: string;
-  photoProfileOfAccount: string;
-  currentAccount: string;
-  agency: string;
-  nameAccountUser: string;
+  recipientAccount: Account;
+  senderAccount: Account;
 };
 
 const makeSut = ({
   sendMoney,
   amountToTransfer,
   recipientAccountChange,
-  profilePhotoOfRecipientsAccount,
-  recipientAgency,
-  recipientCurrentAccount,
-  recipientUserAccountName,
-  photoProfileOfAccount,
-  agency,
-  currentAccount,
-  nameAccountUser,
+  recipientAccount,
+  senderAccount,
 }: SutProps) => {
   const sut = render(
     <TransferMoney
-      nameAccountUser={nameAccountUser}
-      agency={agency}
-      currentAccount={currentAccount}
-      photoProfileOfAccount={photoProfileOfAccount}
-      recipientUserAccountName={recipientUserAccountName}
-      recipientAgency={recipientAgency}
-      recipientCurrentAccount={recipientCurrentAccount}
-      profilePhotoOfRecipientsAccount={profilePhotoOfRecipientsAccount}
+      senderAccount={senderAccount}
+      recipientAccount={recipientAccount}
       recipientAccountChange={recipientAccountChange}
       amountToTransfer={amountToTransfer}
       sendMoney={sendMoney}
@@ -321,28 +241,23 @@ const makeSut = ({
 };
 
 type Props = {
-  nameAccountUser: string;
-  agency: string;
-  currentAccount: string;
-  photoProfileOfAccount: string;
-  recipientUserAccountName: string;
-  recipientAgency: string;
-  recipientCurrentAccount: string;
-  profilePhotoOfRecipientsAccount: string;
+  senderAccount: Account;
+  recipientAccount: Account;
   recipientAccountChange: () => void;
   amountToTransfer: string;
   sendMoney: () => void;
 };
 
+type Account = {
+  userName: string;
+  agency: string;
+  currentAccount: string;
+  profilePhoto: string;
+};
+
 const TransferMoney = ({
-  nameAccountUser,
-  agency,
-  currentAccount,
-  photoProfileOfAccount,
-  recipientAgency,
-  recipientCurrentAccount,
-  recipientUserAccountName,
-  profilePhotoOfRecipientsAccount,
+  senderAccount,
+  recipientAccount,
   recipientAccountChange,
   amountToTransfer,
   sendMoney,
@@ -352,18 +267,18 @@ const TransferMoney = ({
       <Text testID="title_id">Transfer</Text>
       <AccountCard
         id="1"
-        nameAccountUser={nameAccountUser}
-        agency={agency}
-        currentAccount={currentAccount}
-        photoProfileOfAccount={photoProfileOfAccount}
+        nameAccountUser={senderAccount.userName}
+        agency={senderAccount.agency}
+        currentAccount={senderAccount.currentAccount}
+        photoProfileOfAccount={senderAccount.profilePhoto}
       />
       <Text testID="to_id">To</Text>
       <AccountCard
         id="2"
-        nameAccountUser={recipientUserAccountName}
-        agency={recipientAgency}
-        currentAccount={recipientCurrentAccount}
-        photoProfileOfAccount={profilePhotoOfRecipientsAccount}
+        nameAccountUser={recipientAccount.userName}
+        agency={recipientAccount.agency}
+        currentAccount={recipientAccount.currentAccount}
+        photoProfileOfAccount={recipientAccount.profilePhoto}
         recipientAccountChange={recipientAccountChange}
       />
       <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
