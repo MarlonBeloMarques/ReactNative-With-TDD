@@ -1,3 +1,4 @@
+import React from 'react';
 import {fireEvent, render} from '@testing-library/react-native';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import {faker} from '@faker-js/faker';
@@ -239,6 +240,28 @@ describe('Presentation: TransferMoney', () => {
       `R$ ${amountToTransferFake}`,
     );
   });
+
+  test('should show the amount label to transfer correctly', () => {
+    const amountToTransferFake = faker.number.int();
+    const {getByTestId} = render(
+      <TransferMoney
+        nameAccountUser={''}
+        agency={''}
+        currentAccount={''}
+        photoProfileOfAccount={''}
+        recipientUserAccountName={''}
+        recipientAgency={''}
+        recipientCurrentAccount={''}
+        profilePhotoOfRecipientsAccount={''}
+        recipientAccountChange={() => {}}
+        amountToTransfer={`R$ ${amountToTransferFake}`}
+      />,
+    );
+
+    const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
+
+    expect(amountLabelToTransfer.props.children).toEqual(`Amount to transfer`);
+  });
 });
 
 type Props = {
@@ -250,7 +273,7 @@ type Props = {
   recipientAgency: string;
   recipientCurrentAccount: string;
   profilePhotoOfRecipientsAccount: string;
-  recipientAccountChange: () => {};
+  recipientAccountChange: () => void;
   amountToTransfer: string;
 };
 
@@ -286,6 +309,7 @@ const TransferMoney = ({
         recipientAccountChange={recipientAccountChange}
       />
       <Text testID="amount_to_transfer_id">{amountToTransfer}</Text>
+      <Text testID="amount_label_to_transfer_id">{'Amount to transfer'}</Text>
     </View>
   );
 };
@@ -296,7 +320,7 @@ type AccountCardProps = {
   agency: string;
   currentAccount: string;
   photoProfileOfAccount: string;
-  recipientAccountChange?: () => {};
+  recipientAccountChange?: () => void;
 };
 
 const AccountCard = ({
