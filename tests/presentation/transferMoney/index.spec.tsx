@@ -5,25 +5,19 @@ import {faker} from '@faker-js/faker';
 
 describe('Presentation: TransferMoney', () => {
   test('should show title correctly', () => {
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser=""
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     const title = getByTestId('title_id');
 
@@ -34,63 +28,48 @@ describe('Presentation: TransferMoney', () => {
     const nameFaker = faker.person.firstName();
     const agencyFaker = faker.finance.accountNumber();
     const currentAccountFaker = faker.finance.accountNumber();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={nameFaker}
-        agency={agencyFaker}
-        currentAccount={currentAccountFaker}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: agencyFaker,
+      currentAccount: currentAccountFaker,
+      nameAccountUser: nameFaker,
+    });
+
+    expect(getByTestId('name_account_user_1_id').props.children).toEqual(
+      nameFaker,
     );
-
-    const nameAccountUser = getByTestId('name_account_user_1_id');
-    const agencyLabel = getByTestId('agency_label_1_id');
-    const agency = getByTestId('agency_1_id');
-    const currentAccountLabel = getByTestId('current_account_label_1_id');
-    const currentAccount = getByTestId('current_account_1_id');
-
-    expect(nameAccountUser.props.children).toEqual(nameFaker);
-    expect(agencyLabel.props.children).toEqual('Agency');
-    expect(agency.props.children).toEqual(agencyFaker);
-    expect(currentAccountLabel.props.children).toEqual('Current Account');
-    expect(currentAccount.props.children).toEqual(currentAccountFaker);
+    expect(getByTestId('agency_label_1_id').props.children).toEqual('Agency');
+    expect(getByTestId('agency_1_id').props.children).toEqual(agencyFaker);
+    expect(getByTestId('current_account_label_1_id').props.children).toEqual(
+      'Current Account',
+    );
+    expect(getByTestId('current_account_1_id').props.children).toEqual(
+      currentAccountFaker,
+    );
   });
 
   test('should show photo profile of account with success', () => {
-    const nameFaker = faker.person.firstName();
-    const agencyFaker = faker.finance.accountNumber();
-    const currentAccountFaker = faker.finance.accountNumber();
     const photoProfile = faker.image.avatar();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={nameFaker}
-        agency={agencyFaker}
-        currentAccount={currentAccountFaker}
-        photoProfileOfAccount={photoProfile}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: photoProfile,
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     expect(getByTestId('photo_profile_of_account_1_id').props.source).toEqual({
       uri: photoProfile,
@@ -98,29 +77,19 @@ describe('Presentation: TransferMoney', () => {
   });
 
   test('should show "to" text correctly', () => {
-    const nameFaker = faker.person.firstName();
-    const agencyFaker = faker.finance.accountNumber();
-    const currentAccountFaker = faker.finance.accountNumber();
-    const photoProfile = faker.image.avatar();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={nameFaker}
-        agency={agencyFaker}
-        currentAccount={currentAccountFaker}
-        photoProfileOfAccount={photoProfile}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     expect(getByTestId('to_id').props.children).toEqual('To');
   });
@@ -129,60 +98,48 @@ describe('Presentation: TransferMoney', () => {
     const nameFaker = faker.person.firstName();
     const agencyFaker = faker.finance.accountNumber();
     const currentAccountFaker = faker.finance.accountNumber();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={nameFaker}
-        recipientAgency={agencyFaker}
-        recipientCurrentAccount={currentAccountFaker}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: agencyFaker,
+      recipientCurrentAccount: currentAccountFaker,
+      recipientUserAccountName: nameFaker,
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
+
+    expect(getByTestId('name_account_user_2_id').props.children).toEqual(
+      nameFaker,
     );
-
-    const nameAccountUser = getByTestId('name_account_user_2_id');
-    const agencyLabel = getByTestId('agency_label_2_id');
-    const agency = getByTestId('agency_2_id');
-    const currentAccountLabel = getByTestId('current_account_label_2_id');
-    const currentAccount = getByTestId('current_account_2_id');
-
-    expect(nameAccountUser.props.children).toEqual(nameFaker);
-    expect(agencyLabel.props.children).toEqual('Agency');
-    expect(agency.props.children).toEqual(agencyFaker);
-    expect(currentAccountLabel.props.children).toEqual('Current Account');
-    expect(currentAccount.props.children).toEqual(currentAccountFaker);
+    expect(getByTestId('agency_label_2_id').props.children).toEqual('Agency');
+    expect(getByTestId('agency_2_id').props.children).toEqual(agencyFaker);
+    expect(getByTestId('current_account_label_2_id').props.children).toEqual(
+      'Current Account',
+    );
+    expect(getByTestId('current_account_2_id').props.children).toEqual(
+      currentAccountFaker,
+    );
   });
 
   test('should show the recipients photo profile of account with success', () => {
     const photoProfile = faker.image.avatar();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={photoProfile}
-        recipientAccountChange={function (): {} {
-          throw new Error('Function not implemented.');
-        }}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: photoProfile,
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     expect(getByTestId('photo_profile_of_account_2_id').props.source).toEqual({
       uri: photoProfile,
@@ -190,25 +147,20 @@ describe('Presentation: TransferMoney', () => {
   });
 
   test('should call recipientAccountChange when press the change button', () => {
-    const photoProfile = faker.image.avatar();
     const recipientAccountChange = jest.fn();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={photoProfile}
-        recipientAccountChange={recipientAccountChange}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange,
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     fireEvent.press(getByTestId('recipient_account_change_id'));
 
@@ -216,25 +168,19 @@ describe('Presentation: TransferMoney', () => {
   });
 
   test('should show the change button with correct text', () => {
-    const photoProfile = faker.image.avatar();
-    const recipientAccountChange = jest.fn();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={photoProfile}
-        recipientAccountChange={recipientAccountChange}
-        amountToTransfer={''}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: ``,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     const changeText = getByTestId('recipient_account_change_text_id');
 
@@ -243,23 +189,19 @@ describe('Presentation: TransferMoney', () => {
 
   test('should show amount to transfer correctly', () => {
     const amountToTransferFake = faker.number.int();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={() => {}}
-        amountToTransfer={`R$ ${amountToTransferFake}`}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: `R$ ${amountToTransferFake}`,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     const amountToTransfer = getByTestId('amount_to_transfer_id');
 
@@ -270,23 +212,19 @@ describe('Presentation: TransferMoney', () => {
 
   test('should show the amount label to transfer correctly', () => {
     const amountToTransferFake = faker.number.int();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={() => {}}
-        amountToTransfer={`R$ ${amountToTransferFake}`}
-        sendMoney={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney: () => {},
+      amountToTransfer: `R$ ${amountToTransferFake}`,
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     const amountLabelToTransfer = getByTestId('amount_label_to_transfer_id');
 
@@ -295,21 +233,19 @@ describe('Presentation: TransferMoney', () => {
 
   test('should call sendMoney function when press the send money button', () => {
     const sendMoney = jest.fn();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={() => {}}
-        amountToTransfer={`R$ `}
-        sendMoney={sendMoney}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney,
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     fireEvent.press(getByTestId('send_money_id'));
 
@@ -318,27 +254,71 @@ describe('Presentation: TransferMoney', () => {
 
   test('should show send money button with correct text', () => {
     const sendMoney = jest.fn();
-    const {getByTestId} = render(
-      <TransferMoney
-        nameAccountUser={''}
-        agency={''}
-        currentAccount={''}
-        photoProfileOfAccount={''}
-        recipientUserAccountName={''}
-        recipientAgency={''}
-        recipientCurrentAccount={''}
-        profilePhotoOfRecipientsAccount={''}
-        recipientAccountChange={() => {}}
-        amountToTransfer={`R$ `}
-        sendMoney={sendMoney}
-      />,
-    );
+    const {getByTestId} = makeSut({
+      sendMoney,
+      amountToTransfer: '',
+      recipientAccountChange: () => {},
+      profilePhotoOfRecipientsAccount: '',
+      recipientAgency: '',
+      recipientCurrentAccount: '',
+      recipientUserAccountName: '',
+      photoProfileOfAccount: '',
+      agency: '',
+      currentAccount: '',
+      nameAccountUser: '',
+    });
 
     const sendMoneyText = getByTestId('send_money_text_id');
 
     expect(sendMoneyText.props.children).toEqual('Send money');
   });
 });
+
+type SutProps = {
+  sendMoney: () => void;
+  amountToTransfer: string;
+  recipientAccountChange: () => void;
+  profilePhotoOfRecipientsAccount: string;
+  recipientCurrentAccount: string;
+  recipientAgency: string;
+  recipientUserAccountName: string;
+  photoProfileOfAccount: string;
+  currentAccount: string;
+  agency: string;
+  nameAccountUser: string;
+};
+
+const makeSut = ({
+  sendMoney,
+  amountToTransfer,
+  recipientAccountChange,
+  profilePhotoOfRecipientsAccount,
+  recipientAgency,
+  recipientCurrentAccount,
+  recipientUserAccountName,
+  photoProfileOfAccount,
+  agency,
+  currentAccount,
+  nameAccountUser,
+}: SutProps) => {
+  const sut = render(
+    <TransferMoney
+      nameAccountUser={nameAccountUser}
+      agency={agency}
+      currentAccount={currentAccount}
+      photoProfileOfAccount={photoProfileOfAccount}
+      recipientUserAccountName={recipientUserAccountName}
+      recipientAgency={recipientAgency}
+      recipientCurrentAccount={recipientCurrentAccount}
+      profilePhotoOfRecipientsAccount={profilePhotoOfRecipientsAccount}
+      recipientAccountChange={recipientAccountChange}
+      amountToTransfer={amountToTransfer}
+      sendMoney={sendMoney}
+    />,
+  );
+
+  return sut;
+};
 
 type Props = {
   nameAccountUser: string;
