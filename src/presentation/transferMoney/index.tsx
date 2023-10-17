@@ -6,22 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-type Props = {
-  senderAccount: Account;
-  recipientAccount: Account;
-  recipientAccountChange: () => void;
-  amountToTransfer: string;
-  sendMoney: (recipientAccount: Account) => void;
-  isLoading: boolean;
-};
-
-export type Account = {
-  userName: string;
-  agency: string;
-  currentAccount: string;
-  profilePhoto: string;
-};
+import TransferMoneyViewModel from './model';
 
 const TransferMoney = ({
   senderAccount,
@@ -30,7 +15,7 @@ const TransferMoney = ({
   amountToTransfer,
   sendMoney,
   isLoading,
-}: Props) => {
+}: TransferMoneyViewModel) => {
   return (
     <View>
       {isLoading && <ActivityIndicator testID="loading_animation_id" />}

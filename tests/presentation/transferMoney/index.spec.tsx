@@ -1,7 +1,8 @@
 import React from 'react';
 import {fireEvent, render} from '@testing-library/react-native';
 import {faker} from '@faker-js/faker';
-import TransferMoney, {Account} from '../../../src/presentation/transferMoney';
+import TransferMoney from '../../../src/presentation/transferMoney';
+import {Account} from '../../../src/presentation/transferMoney/model';
 
 const makeAccount = (): Account => {
   return {
