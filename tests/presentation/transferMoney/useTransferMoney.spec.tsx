@@ -91,6 +91,22 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
   });
+
+  test('should update isLoading to false when finish call get sender and recipient accounts', async () => {
+    const getSenderAccount = new GetSenderAccountFaker();
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+      }),
+    );
+
+    expect(result.current.isLoading).toEqual(true);
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
+  });
 });
 
 type TransferMoneyModel = {
@@ -171,6 +187,8 @@ const useTransferMoney = ({
     userName: '',
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const callGetSenderAccount = useCallback(async () => {
     try {
       const response = await getSenderAccount.get();
@@ -194,14 +212,19 @@ const useTransferMoney = ({
   }, [getRecipientAccount]);
 
   useEffect(() => {
-    callGetSenderAccount();
-    callGetRecipientAccount();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    callGetSenderAndRecipientAccounts();
   }, []);
+
+  const callGetSenderAndRecipientAccounts = async () => {
+    setIsLoading(true);
+    await callGetSenderAccount();
+    await callGetRecipientAccount();
+    setIsLoading(false);
+  };
 
   return {
     amountToTransfer: '',
-    isLoading: false,
+    isLoading,
     recipientAccount,
     recipientAccountChange: () => {},
     senderAccount,
