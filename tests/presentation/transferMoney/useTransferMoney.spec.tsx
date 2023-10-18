@@ -70,6 +70,27 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
   });
+
+  test('should show alert when call get of GetRecipientAccount returning a error exception', async () => {
+    jest.spyOn(Alert, 'alert');
+
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    getRecipientAccount.completeGetWithError();
+    renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        new GetRecipientAccountError().message,
+        expect.anything(),
+      );
+    });
+  });
 });
 
 type TransferMoneyModel = {
@@ -103,10 +124,18 @@ class GetSenderAccountFaker implements GetSenderAccount {
 
 class GetRecipientAccountFaker implements GetRecipientAccount {
   recipientAccount: Account = makeAccount();
+  throwError: boolean = false;
 
   async get(): Promise<Account> {
+    if (this.throwError) {
+      throw new GetRecipientAccountError();
+    }
     return this.recipientAccount;
   }
+
+  completeGetWithError = () => {
+    this.throwError = true;
+  };
 }
 
 class GetSenderAccountError extends Error {
@@ -114,6 +143,14 @@ class GetSenderAccountError extends Error {
     super();
     this.message = 'Try to get account again.';
     this.name = 'GetSenderAccountError';
+  }
+}
+
+class GetRecipientAccountError extends Error {
+  constructor() {
+    super();
+    this.message = 'Try to get account again.';
+    this.name = 'GetRecipientAccountError';
   }
 }
 
@@ -146,8 +183,14 @@ const useTransferMoney = ({
   }, [getSenderAccount]);
 
   const callGetRecipientAccount = useCallback(async () => {
-    const response = await getRecipientAccount.get();
-    setRecipientAccount(response);
+    try {
+      const response = await getRecipientAccount.get();
+      setRecipientAccount(response);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      }
+    }
   }, [getRecipientAccount]);
 
   useEffect(() => {
