@@ -19,7 +19,10 @@ describe('Presentation: useTransferMoney', () => {
   test('should get senderAccount by GetSenderAccount when started', async () => {
     const getSenderAccount = new GetSenderAccountFaker();
     const {result} = renderHook(() =>
-      useTransferMoney({getSenderAccount: getSenderAccount}),
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+      }),
     );
 
     await waitFor(() => {
@@ -29,12 +32,35 @@ describe('Presentation: useTransferMoney', () => {
     });
   });
 
+  test('should get recipientAccount by GetRecipientAccount when started', async () => {
+    const getSenderAccount = new GetSenderAccountFaker();
+
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.recipientAccount).toEqual(
+        getRecipientAccount.recipientAccount,
+      );
+    });
+  });
+
   test('should show alert when call get of GetSenderAccount returning a error exception', async () => {
     jest.spyOn(Alert, 'alert');
 
     const getSenderAccount = new GetSenderAccountFaker();
     getSenderAccount.completeGetWithError();
-    renderHook(() => useTransferMoney({getSenderAccount: getSenderAccount}));
+    renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+      }),
+    );
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -48,9 +74,14 @@ describe('Presentation: useTransferMoney', () => {
 
 type TransferMoneyModel = {
   getSenderAccount: GetSenderAccount;
+  getRecipientAccount: GetRecipientAccount;
 };
 
 interface GetSenderAccount {
+  get(): Promise<Account>;
+}
+
+interface GetRecipientAccount {
   get(): Promise<Account>;
 }
 
@@ -70,6 +101,14 @@ class GetSenderAccountFaker implements GetSenderAccount {
   };
 }
 
+class GetRecipientAccountFaker implements GetRecipientAccount {
+  recipientAccount: Account = makeAccount();
+
+  async get(): Promise<Account> {
+    return this.recipientAccount;
+  }
+}
+
 class GetSenderAccountError extends Error {
   constructor() {
     super();
@@ -80,8 +119,15 @@ class GetSenderAccountError extends Error {
 
 const useTransferMoney = ({
   getSenderAccount,
+  getRecipientAccount,
 }: TransferMoneyModel): TransferMoneyViewModel => {
   const [senderAccount, setSenderAccount] = useState<Account>({
+    agency: '',
+    currentAccount: '',
+    profilePhoto: '',
+    userName: '',
+  });
+  const [recipientAccount, setRecipientAccount] = useState<Account>({
     agency: '',
     currentAccount: '',
     profilePhoto: '',
@@ -99,19 +145,21 @@ const useTransferMoney = ({
     }
   }, [getSenderAccount]);
 
+  const callGetRecipientAccount = useCallback(async () => {
+    const response = await getRecipientAccount.get();
+    setRecipientAccount(response);
+  }, [getRecipientAccount]);
+
   useEffect(() => {
     callGetSenderAccount();
-  }, [callGetSenderAccount]);
+    callGetRecipientAccount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     amountToTransfer: '',
     isLoading: false,
-    recipientAccount: {
-      agency: '',
-      currentAccount: '',
-      profilePhoto: '',
-      userName: '',
-    },
+    recipientAccount,
     recipientAccountChange: () => {},
     senderAccount,
     sendMoney: () => {},
