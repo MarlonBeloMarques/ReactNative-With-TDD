@@ -4,6 +4,7 @@ import TransferMoneyViewModel, {
 } from '../../../src/presentation/transferMoney/model';
 import {faker} from '@faker-js/faker';
 import {useCallback, useEffect, useState} from 'react';
+import {Alert} from 'react-native';
 
 const makeAccount = (): Account => {
   return {
@@ -28,15 +29,18 @@ describe('Presentation: useTransferMoney', () => {
     });
   });
 
-  test('should get senderAccount by GetSenderAccount when started', async () => {
+  test('should show alert when call get of GetSenderAccount returning a error exception', async () => {
+    jest.spyOn(Alert, 'alert');
+
     const getSenderAccount = new GetSenderAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({getSenderAccount: getSenderAccount}),
-    );
+    getSenderAccount.completeGetWithError();
+    renderHook(() => useTransferMoney({getSenderAccount: getSenderAccount}));
 
     await waitFor(() => {
-      expect(result.current.senderAccount).toEqual(
-        getSenderAccount.senderAccount,
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        new GetSenderAccountError().message,
+        expect.anything(),
       );
     });
   });
@@ -52,9 +56,25 @@ interface GetSenderAccount {
 
 class GetSenderAccountFaker implements GetSenderAccount {
   senderAccount: Account = makeAccount();
+  throwError: boolean = false;
 
   async get(): Promise<Account> {
+    if (this.throwError) {
+      throw new GetSenderAccountError();
+    }
     return this.senderAccount;
+  }
+
+  completeGetWithError = () => {
+    this.throwError = true;
+  };
+}
+
+class GetSenderAccountError extends Error {
+  constructor() {
+    super();
+    this.message = 'Try to get account again.';
+    this.name = 'GetSenderAccountError';
   }
 }
 
@@ -69,8 +89,14 @@ const useTransferMoney = ({
   });
 
   const callGetSenderAccount = useCallback(async () => {
-    const response = await getSenderAccount.get();
-    setSenderAccount(response);
+    try {
+      const response = await getSenderAccount.get();
+      setSenderAccount(response);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      }
+    }
   }, [getSenderAccount]);
 
   useEffect(() => {
