@@ -22,6 +22,7 @@ describe('Presentation: useTransferMoney', () => {
       useTransferMoney({
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer: 0,
       }),
     );
 
@@ -40,6 +41,7 @@ describe('Presentation: useTransferMoney', () => {
       useTransferMoney({
         getSenderAccount: getSenderAccount,
         getRecipientAccount,
+        amountToTransfer: 0,
       }),
     );
 
@@ -59,6 +61,7 @@ describe('Presentation: useTransferMoney', () => {
       useTransferMoney({
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer: 0,
       }),
     );
 
@@ -80,6 +83,7 @@ describe('Presentation: useTransferMoney', () => {
       useTransferMoney({
         getSenderAccount: new GetSenderAccountFaker(),
         getRecipientAccount,
+        amountToTransfer: 0,
       }),
     );
 
@@ -98,6 +102,7 @@ describe('Presentation: useTransferMoney', () => {
       useTransferMoney({
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer: 0,
       }),
     );
 
@@ -107,11 +112,26 @@ describe('Presentation: useTransferMoney', () => {
       expect(result.current.isLoading).toEqual(false);
     });
   });
+
+  test('should get amountToTransfer in correct pattern', async () => {
+    const amountToTransfer = Number(faker.commerce.price());
+    const getSenderAccount = new GetSenderAccountFaker();
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer,
+      }),
+    );
+
+    expect(result.current.amountToTransfer).toEqual(`R$ ${amountToTransfer}`);
+  });
 });
 
 type TransferMoneyModel = {
   getSenderAccount: GetSenderAccount;
   getRecipientAccount: GetRecipientAccount;
+  amountToTransfer: number;
 };
 
 interface GetSenderAccount {
@@ -173,6 +193,7 @@ class GetRecipientAccountError extends Error {
 const useTransferMoney = ({
   getSenderAccount,
   getRecipientAccount,
+  amountToTransfer,
 }: TransferMoneyModel): TransferMoneyViewModel => {
   const [senderAccount, setSenderAccount] = useState<Account>({
     agency: '',
@@ -215,6 +236,10 @@ const useTransferMoney = ({
     callGetSenderAndRecipientAccounts();
   }, []);
 
+  const getAmountToTransfer = (): string => {
+    return `R$ ${amountToTransfer}`;
+  };
+
   const callGetSenderAndRecipientAccounts = async () => {
     setIsLoading(true);
     await callGetSenderAccount();
@@ -223,7 +248,7 @@ const useTransferMoney = ({
   };
 
   return {
-    amountToTransfer: '',
+    amountToTransfer: getAmountToTransfer(),
     isLoading,
     recipientAccount,
     recipientAccountChange: () => {},
