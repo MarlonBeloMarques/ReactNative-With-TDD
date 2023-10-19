@@ -126,6 +126,20 @@ describe('Presentation: useTransferMoney', () => {
 
     expect(result.current.amountToTransfer).toEqual(`R$ ${amountToTransfer}`);
   });
+
+  test('should get amountToTransfer in correct pattern when undefined', async () => {
+    const amountToTransfer = undefined as unknown as number;
+    const getSenderAccount = new GetSenderAccountFaker();
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer,
+      }),
+    );
+
+    expect(result.current.amountToTransfer).toEqual(`R$ 0`);
+  });
 });
 
 type TransferMoneyModel = {
@@ -237,7 +251,7 @@ const useTransferMoney = ({
   }, []);
 
   const getAmountToTransfer = (): string => {
-    return `R$ ${amountToTransfer}`;
+    return `R$ ${amountToTransfer || 0}`;
   };
 
   const callGetSenderAndRecipientAccounts = async () => {
