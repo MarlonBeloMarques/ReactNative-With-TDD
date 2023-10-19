@@ -23,6 +23,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
+        navigateTo: () => {},
       }),
     );
 
@@ -42,6 +43,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount,
         amountToTransfer: 0,
+        navigateTo: () => {},
       }),
     );
 
@@ -62,6 +64,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
+        navigateTo: () => {},
       }),
     );
 
@@ -84,6 +87,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: new GetSenderAccountFaker(),
         getRecipientAccount,
         amountToTransfer: 0,
+        navigateTo: () => {},
       }),
     );
 
@@ -103,6 +107,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
+        navigateTo: () => {},
       }),
     );
 
@@ -121,6 +126,7 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer,
+        navigateTo: () => {},
       }),
     );
 
@@ -135,10 +141,27 @@ describe('Presentation: useTransferMoney', () => {
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer,
+        navigateTo: () => {},
       }),
     );
 
     expect(result.current.amountToTransfer).toEqual(`R$ 0`);
+  });
+
+  test('should call navigateTo function with correct param when call recipientAccountChange', async () => {
+    const navigateTo = jest.fn();
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer: 0,
+        navigateTo,
+      }),
+    );
+
+    result.current.recipientAccountChange();
+
+    expect(navigateTo).toHaveBeenLastCalledWith('RecipientAccountChange');
   });
 });
 
@@ -146,6 +169,7 @@ type TransferMoneyModel = {
   getSenderAccount: GetSenderAccount;
   getRecipientAccount: GetRecipientAccount;
   amountToTransfer: number;
+  navigateTo: (screen: string) => void;
 };
 
 interface GetSenderAccount {
@@ -208,6 +232,7 @@ const useTransferMoney = ({
   getSenderAccount,
   getRecipientAccount,
   amountToTransfer,
+  navigateTo,
 }: TransferMoneyModel): TransferMoneyViewModel => {
   const [senderAccount, setSenderAccount] = useState<Account>({
     agency: '',
@@ -261,11 +286,15 @@ const useTransferMoney = ({
     setIsLoading(false);
   };
 
+  const recipientAccountChange = () => {
+    navigateTo('RecipientAccountChange');
+  };
+
   return {
     amountToTransfer: getAmountToTransfer(),
     isLoading,
     recipientAccount,
-    recipientAccountChange: () => {},
+    recipientAccountChange,
     senderAccount,
     sendMoney: () => {},
   };
