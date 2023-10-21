@@ -61,7 +61,7 @@ describe('Presentation: useTransferMoney', () => {
 
     const getSenderAccount = new GetSenderAccountFaker();
     getSenderAccount.completeGetWithError();
-    renderHook(() =>
+    const {result} = renderHook(() =>
       useTransferMoney({
         getSenderAccount: getSenderAccount,
         getRecipientAccount: new GetRecipientAccountFaker(),
@@ -78,6 +78,13 @@ describe('Presentation: useTransferMoney', () => {
         expect.anything(),
       );
     });
+
+    expect(result.current.senderAccount).toEqual({
+      agency: '',
+      currentAccount: '',
+      profilePhoto: '',
+      userName: '',
+    });
   });
 
   test('should show alert when call get of GetRecipientAccount returning a error exception', async () => {
@@ -85,7 +92,7 @@ describe('Presentation: useTransferMoney', () => {
 
     const getRecipientAccount = new GetRecipientAccountFaker();
     getRecipientAccount.completeGetWithError();
-    renderHook(() =>
+    const {result} = renderHook(() =>
       useTransferMoney({
         getSenderAccount: new GetSenderAccountFaker(),
         getRecipientAccount,
@@ -101,6 +108,13 @@ describe('Presentation: useTransferMoney', () => {
         new GetRecipientAccountError().message,
         expect.anything(),
       );
+    });
+
+    expect(result.current.recipientAccount).toEqual({
+      agency: '',
+      currentAccount: '',
+      profilePhoto: '',
+      userName: '',
     });
   });
 
