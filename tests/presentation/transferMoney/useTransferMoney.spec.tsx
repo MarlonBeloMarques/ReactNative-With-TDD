@@ -1,10 +1,14 @@
 import {renderHook, waitFor} from '@testing-library/react-native';
-import TransferMoneyViewModel, {
-  Account,
-} from '../../../src/presentation/transferMoney/model';
+import {Account} from '../../../src/presentation/transferMoney/model';
 import {faker} from '@faker-js/faker';
-import {useCallback, useEffect, useState} from 'react';
 import {Alert} from 'react-native';
+import SendMoney from '../../../src/domain/useCases/sendMoney';
+import GetSenderAccount from '../../../src/domain/useCases/getSenderAccount';
+import GetRecipientAccount from '../../../src/domain/useCases/getRecipientAccount';
+import useTransferMoney from '../../../src/presentation/transferMoney/useTransferMoney';
+import SendMoneyError from '../../../src/data/errors/sendMoneyError';
+import GetRecipientAccountError from '../../../src/data/errors/getRecipientAccountError';
+import GetSenderAccountError from '../../../src/data/errors/getSenderAccountError';
 
 const makeAccount = (): Account => {
   return {
@@ -274,26 +278,6 @@ describe('Presentation: useTransferMoney', () => {
   });
 });
 
-type TransferMoneyModel = {
-  getSenderAccount: GetSenderAccount;
-  getRecipientAccount: GetRecipientAccount;
-  amountToTransfer: number;
-  navigateTo: (screen: string) => void;
-  sendMoney: SendMoney;
-};
-
-interface GetSenderAccount {
-  get(): Promise<Account>;
-}
-
-interface GetRecipientAccount {
-  get(): Promise<Account>;
-}
-
-interface SendMoney {
-  sendTo(account: Account, amount: number): Promise<void>;
-}
-
 class SendMoneySpy implements SendMoney {
   called = 0;
   calledWith: {account: Account; amount: number} = {
@@ -354,114 +338,3 @@ class GetRecipientAccountFaker implements GetRecipientAccount {
     this.throwError = true;
   };
 }
-
-class GetSenderAccountError extends Error {
-  constructor() {
-    super();
-    this.message = 'Try to get account again.';
-    this.name = 'GetSenderAccountError';
-  }
-}
-
-class GetRecipientAccountError extends Error {
-  constructor() {
-    super();
-    this.message = 'Try to get account again.';
-    this.name = 'GetRecipientAccountError';
-  }
-}
-
-class SendMoneyError extends Error {
-  constructor() {
-    super();
-    this.message = 'Try to send money again.';
-    this.name = 'SendMoneyError';
-  }
-}
-
-const useTransferMoney = ({
-  getSenderAccount,
-  getRecipientAccount,
-  amountToTransfer,
-  navigateTo,
-  sendMoney,
-}: TransferMoneyModel): TransferMoneyViewModel => {
-  const [senderAccount, setSenderAccount] = useState<Account>({
-    agency: '',
-    currentAccount: '',
-    profilePhoto: '',
-    userName: '',
-  });
-  const [recipientAccount, setRecipientAccount] = useState<Account>({
-    agency: '',
-    currentAccount: '',
-    profilePhoto: '',
-    userName: '',
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  const callGetSenderAccount = useCallback(async () => {
-    try {
-      const response = await getSenderAccount.get();
-      setSenderAccount(response);
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
-      }
-    }
-  }, [getSenderAccount]);
-
-  const callGetRecipientAccount = useCallback(async () => {
-    try {
-      const response = await getRecipientAccount.get();
-      setRecipientAccount(response);
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
-      }
-    }
-  }, [getRecipientAccount]);
-
-  useEffect(() => {
-    callGetSenderAndRecipientAccounts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const getAmountToTransfer = (): string => {
-    return `R$ ${amountToTransfer || 0}`;
-  };
-
-  const callGetSenderAndRecipientAccounts = async () => {
-    setIsLoading(true);
-    await callGetSenderAccount();
-    await callGetRecipientAccount();
-    setIsLoading(false);
-  };
-
-  const recipientAccountChange = () => {
-    navigateTo('RecipientAccountChange');
-  };
-
-  const sendMoneyTo = async (recipientAccount: Account, amount: number) => {
-    setIsLoading(true);
-    try {
-      await sendMoney.sendTo(recipientAccount, amount);
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
-      }
-    }
-
-    setIsLoading(false);
-  };
-
-  return {
-    amountToTransfer: getAmountToTransfer(),
-    isLoading,
-    recipientAccount,
-    recipientAccountChange,
-    senderAccount,
-    sendMoney: sendMoneyTo,
-  };
-};
