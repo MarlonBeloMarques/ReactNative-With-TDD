@@ -198,6 +198,40 @@ describe('Presentation: useTransferMoney', () => {
       amount: amountToTransfer,
     });
   });
+
+  test('should show alert when call sendTo of SendMoney returning a error exception', async () => {
+    jest.spyOn(Alert, 'alert');
+
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    const sendMoney = new SendMoneySpy(
+      new GetSenderAccountFaker().senderAccount,
+    );
+    sendMoney.completeSendToWithError();
+    const amountToTransfer = Number(faker.commerce.price());
+
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount,
+        amountToTransfer,
+        navigateTo: () => {},
+        sendMoney,
+      }),
+    );
+
+    result.current.sendMoney(
+      getRecipientAccount.recipientAccount,
+      amountToTransfer,
+    );
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        new SendMoneyError().message,
+        expect.anything(),
+      );
+    });
+  });
 });
 
 type TransferMoneyModel = {
@@ -231,14 +265,22 @@ class SendMoneySpy implements SendMoney {
     },
     amount: 0,
   };
+  throwError: boolean = false;
 
   constructor(private readonly senderAccount: Account) {}
 
   async sendTo(account: Account, amount: number) {
+    if (this.throwError) {
+      throw new SendMoneyError();
+    }
     this.called += 1;
     this.calledWith.account = account;
     this.calledWith.amount = amount;
   }
+
+  completeSendToWithError = () => {
+    this.throwError = true;
+  };
 }
 
 class GetSenderAccountFaker implements GetSenderAccount {
@@ -286,6 +328,14 @@ class GetRecipientAccountError extends Error {
     super();
     this.message = 'Try to get account again.';
     this.name = 'GetRecipientAccountError';
+  }
+}
+
+class SendMoneyError extends Error {
+  constructor() {
+    super();
+    this.message = 'Try to send money again.';
+    this.name = 'SendMoneyError';
   }
 }
 
@@ -354,7 +404,13 @@ const useTransferMoney = ({
   };
 
   const sendMoneyTo = async (recipientAccount: Account, amount: number) => {
-    await sendMoney.sendTo(recipientAccount, amount);
+    try {
+      await sendMoney.sendTo(recipientAccount, amount);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      }
+    }
   };
 
   return {
