@@ -232,6 +232,32 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
   });
+
+  test('should update isLoading to false when finish call send money', async () => {
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    const sendMoney = new SendMoneySpy(
+      new GetSenderAccountFaker().senderAccount,
+    );
+    const amountToTransfer = Number(faker.commerce.price());
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount,
+        amountToTransfer,
+        navigateTo: () => {},
+        sendMoney,
+      }),
+    );
+
+    result.current.sendMoney(
+      getRecipientAccount.recipientAccount,
+      amountToTransfer,
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
+  });
 });
 
 type TransferMoneyModel = {
@@ -404,6 +430,7 @@ const useTransferMoney = ({
   };
 
   const sendMoneyTo = async (recipientAccount: Account, amount: number) => {
+    setIsLoading(true);
     try {
       await sendMoney.sendTo(recipientAccount, amount);
     } catch (error) {
@@ -411,6 +438,8 @@ const useTransferMoney = ({
         Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
       }
     }
+
+    setIsLoading(false);
   };
 
   return {
