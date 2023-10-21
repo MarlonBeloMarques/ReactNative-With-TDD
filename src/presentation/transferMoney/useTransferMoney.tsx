@@ -42,6 +42,10 @@ const useTransferMoney = ({
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      } else {
+        Alert.alert('Sorry', 'Unexpected error', [
+          {text: 'ok', onPress: () => {}},
+        ]);
       }
     }
   }, [getSenderAccount]);
@@ -53,6 +57,10 @@ const useTransferMoney = ({
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      } else {
+        Alert.alert('Sorry', 'Unexpected error', [
+          {text: 'ok', onPress: () => {}},
+        ]);
       }
     }
   }, [getRecipientAccount]);
@@ -84,6 +92,10 @@ const useTransferMoney = ({
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Sorry', error.message, [{text: 'ok', onPress: () => {}}]);
+      } else {
+        Alert.alert('Sorry', 'Unexpected error', [
+          {text: 'ok', onPress: () => {}},
+        ]);
       }
     }
 

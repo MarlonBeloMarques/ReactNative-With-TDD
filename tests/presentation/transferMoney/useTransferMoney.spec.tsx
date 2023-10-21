@@ -91,6 +91,37 @@ describe('Presentation: useTransferMoney', () => {
     });
   });
 
+  test('should show alert when call get of GetSenderAccount returning a error different of GetSenderAccountError', async () => {
+    jest.spyOn(Alert, 'alert');
+
+    const getSenderAccount = new GetSenderAccountFaker();
+    getSenderAccount.completeGetWithError(true);
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: getSenderAccount,
+        getRecipientAccount: new GetRecipientAccountFaker(),
+        amountToTransfer: 0,
+        navigateTo: () => {},
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
+      }),
+    );
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        'Unexpected error',
+        expect.anything(),
+      );
+    });
+
+    expect(result.current.senderAccount).toEqual({
+      agency: '',
+      currentAccount: '',
+      profilePhoto: '',
+      userName: '',
+    });
+  });
+
   test('should show alert when call get of GetRecipientAccount returning a error exception', async () => {
     jest.spyOn(Alert, 'alert');
 
@@ -110,6 +141,37 @@ describe('Presentation: useTransferMoney', () => {
       expect(Alert.alert).toHaveBeenCalledWith(
         'Sorry',
         new GetRecipientAccountError().message,
+        expect.anything(),
+      );
+    });
+
+    expect(result.current.recipientAccount).toEqual({
+      agency: '',
+      currentAccount: '',
+      profilePhoto: '',
+      userName: '',
+    });
+  });
+
+  test('should show alert when call get of GetRecipientAccount returning a error different of GetRecipientAccountError', async () => {
+    jest.spyOn(Alert, 'alert');
+
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    getRecipientAccount.completeGetWithError(true);
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount,
+        amountToTransfer: 0,
+        navigateTo: () => {},
+        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
+      }),
+    );
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        'Unexpected error',
         expect.anything(),
       );
     });
@@ -251,6 +313,40 @@ describe('Presentation: useTransferMoney', () => {
     });
   });
 
+  test('should show alert when call sendTo of SendMoney returning error different of SendMoneyError', async () => {
+    jest.spyOn(Alert, 'alert');
+
+    const getRecipientAccount = new GetRecipientAccountFaker();
+    const sendMoney = new SendMoneySpy(
+      new GetSenderAccountFaker().senderAccount,
+    );
+    sendMoney.completeSendToWithError(true);
+    const amountToTransfer = Number(faker.commerce.price());
+
+    const {result} = renderHook(() =>
+      useTransferMoney({
+        getSenderAccount: new GetSenderAccountFaker(),
+        getRecipientAccount,
+        amountToTransfer,
+        navigateTo: () => {},
+        sendMoney,
+      }),
+    );
+
+    result.current.sendMoney(
+      getRecipientAccount.recipientAccount,
+      amountToTransfer,
+    );
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Sorry',
+        'Unexpected error',
+        expect.anything(),
+      );
+    });
+  });
+
   test('should update isLoading to false when finish call send money', async () => {
     const getRecipientAccount = new GetRecipientAccountFaker();
     const sendMoney = new SendMoneySpy(
@@ -290,6 +386,7 @@ class SendMoneySpy implements SendMoney {
     amount: 0,
   };
   throwError: boolean = false;
+  throwOtherError: boolean = false;
 
   constructor(private readonly senderAccount: Account) {}
 
@@ -297,44 +394,67 @@ class SendMoneySpy implements SendMoney {
     if (this.throwError) {
       throw new SendMoneyError();
     }
+    if (this.throwOtherError) {
+      throw {};
+    }
     this.called += 1;
     this.calledWith.account = account;
     this.calledWith.amount = amount;
   }
 
-  completeSendToWithError = () => {
-    this.throwError = true;
+  completeSendToWithError = (differentError = false) => {
+    if (differentError) {
+      this.throwOtherError = true;
+    } else {
+      this.throwError = true;
+    }
   };
 }
 
 class GetSenderAccountFaker implements GetSenderAccount {
   senderAccount: Account = makeAccount();
   throwError: boolean = false;
+  throwOtherError: boolean = false;
 
   async get(): Promise<Account> {
     if (this.throwError) {
       throw new GetSenderAccountError();
     }
+    if (this.throwOtherError) {
+      throw {};
+    }
     return this.senderAccount;
   }
 
-  completeGetWithError = () => {
-    this.throwError = true;
+  completeGetWithError = (differentError = false) => {
+    if (differentError) {
+      this.throwOtherError = true;
+    } else {
+      this.throwError = true;
+    }
   };
 }
 
 class GetRecipientAccountFaker implements GetRecipientAccount {
   recipientAccount: Account = makeAccount();
   throwError: boolean = false;
+  throwOtherError: boolean = false;
 
   async get(): Promise<Account> {
     if (this.throwError) {
       throw new GetRecipientAccountError();
     }
+    if (this.throwOtherError) {
+      throw {};
+    }
     return this.recipientAccount;
   }
 
-  completeGetWithError = () => {
-    this.throwError = true;
+  completeGetWithError = (differentError = false) => {
+    if (differentError) {
+      this.throwOtherError = true;
+    } else {
+      this.throwError = true;
+    }
   };
 }
