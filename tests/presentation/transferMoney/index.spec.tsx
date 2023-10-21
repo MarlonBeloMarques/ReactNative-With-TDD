@@ -194,10 +194,11 @@ describe('Presentation: TransferMoney', () => {
 
   test('should call sendMoney function correctly when press the send money button', () => {
     const recipientAccount = makeAccount();
+    const amountToTransfer = faker.commerce.price();
     const sendMoney = jest.fn();
     const {getByTestId} = makeSut({
       sendMoney,
-      amountToTransfer: '',
+      amountToTransfer,
       recipientAccountChange: () => {},
       recipientAccount,
       senderAccount: makeAccount(),
@@ -206,7 +207,10 @@ describe('Presentation: TransferMoney', () => {
 
     fireEvent.press(getByTestId('send_money_id'));
 
-    expect(sendMoney).toHaveBeenCalledWith(recipientAccount);
+    expect(sendMoney).toHaveBeenCalledWith(
+      recipientAccount,
+      Number(amountToTransfer),
+    );
   });
 
   test('should show send money button with correct text', () => {

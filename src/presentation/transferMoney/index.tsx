@@ -44,7 +44,9 @@ const TransferMoney = ({
           </Text>
           <TouchableOpacity
             testID="send_money_id"
-            onPress={() => sendMoney(recipientAccount)}>
+            onPress={() =>
+              sendMoney(recipientAccount, Number(amountToTransfer))
+            }>
             <Text testID="send_money_text_id">{'Send money'}</Text>
           </TouchableOpacity>
         </View>

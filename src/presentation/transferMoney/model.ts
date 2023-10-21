@@ -10,7 +10,7 @@ type TransferMoneyViewModel = {
   recipientAccount: Account;
   recipientAccountChange: () => void;
   amountToTransfer: string;
-  sendMoney: (recipientAccount: Account) => void;
+  sendMoney: (recipientAccount: Account, amount: number) => void;
   isLoading: boolean;
 };
 

@@ -24,7 +24,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -45,7 +45,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount,
         amountToTransfer: 0,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -67,7 +67,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -91,7 +91,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount,
         amountToTransfer: 0,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
       }),
     );
 
@@ -112,7 +112,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -132,7 +132,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -148,7 +148,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer,
         navigateTo: () => {},
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
       }),
     );
 
@@ -163,7 +163,7 @@ describe('Presentation: useTransferMoney', () => {
         getRecipientAccount: new GetRecipientAccountFaker(),
         amountToTransfer: 0,
         navigateTo,
-        sendMoney: new SendMoneySpy(),
+        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
       }),
     );
 
@@ -173,23 +173,30 @@ describe('Presentation: useTransferMoney', () => {
   });
 
   test('should send money to recipient account through of SendMoney when call sendMoney function', async () => {
-    const sendMoney = new SendMoneySpy();
+    const sendMoney = new SendMoneySpy(
+      new GetSenderAccountFaker().senderAccount,
+    );
+
+    const amountToTransfer = Number(faker.commerce.price());
     const getRecipientAccount = new GetRecipientAccountFaker();
     const {result} = renderHook(() =>
       useTransferMoney({
         getSenderAccount: new GetSenderAccountFaker(),
         getRecipientAccount,
-        amountToTransfer: 0,
+        amountToTransfer,
         navigateTo: () => {},
         sendMoney,
       }),
     );
 
     const recipientAccount = await getRecipientAccount.get();
-    result.current.sendMoney(recipientAccount);
+    result.current.sendMoney(recipientAccount, amountToTransfer);
 
     expect(sendMoney.called).toEqual(1);
-    expect(sendMoney.calledWith).toEqual(recipientAccount);
+    expect(sendMoney.calledWith).toEqual({
+      account: recipientAccount,
+      amount: amountToTransfer,
+    });
   });
 });
 
@@ -210,21 +217,27 @@ interface GetRecipientAccount {
 }
 
 interface SendMoney {
-  sendTo(account: Account): Promise<void>;
+  sendTo(account: Account, amount: number): Promise<void>;
 }
 
 class SendMoneySpy implements SendMoney {
   called = 0;
-  calledWith: Account = {
-    userName: '',
-    agency: '',
-    currentAccount: '',
-    profilePhoto: '',
+  calledWith: {account: Account; amount: number} = {
+    account: {
+      userName: '',
+      agency: '',
+      currentAccount: '',
+      profilePhoto: '',
+    },
+    amount: 0,
   };
 
-  async sendTo(account: Account) {
+  constructor(private readonly senderAccount: Account) {}
+
+  async sendTo(account: Account, amount: number) {
     this.called += 1;
-    this.calledWith = account;
+    this.calledWith.account = account;
+    this.calledWith.amount = amount;
   }
 }
 
@@ -322,6 +335,7 @@ const useTransferMoney = ({
 
   useEffect(() => {
     callGetSenderAndRecipientAccounts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getAmountToTransfer = (): string => {
@@ -339,8 +353,8 @@ const useTransferMoney = ({
     navigateTo('RecipientAccountChange');
   };
 
-  const sendMoneyTo = async (recipientAccount: Account) => {
-    await sendMoney.sendTo(recipientAccount);
+  const sendMoneyTo = async (recipientAccount: Account, amount: number) => {
+    await sendMoney.sendTo(recipientAccount, amount);
   };
 
   return {
