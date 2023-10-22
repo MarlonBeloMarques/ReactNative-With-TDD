@@ -89,7 +89,10 @@ const TransferMoney = ({
               }}
               testID="send_money_id"
               onPress={() =>
-                sendMoney(recipientAccount, Number(amountToTransfer))
+                sendMoney(
+                  recipientAccount,
+                  Number(amountToTransfer.replace('R$', '')),
+                )
               }>
               <Text
                 style={{fontSize: 18, fontWeight: 'bold'}}
