@@ -19,18 +19,19 @@ const makeAccount = (): Account => {
   };
 };
 
+const emptyAccount = {
+  agency: '',
+  currentAccount: '',
+  profilePhoto: '',
+  userName: '',
+};
+
 describe('Presentation: useTransferMoney', () => {
   test('should get senderAccount by GetSenderAccount when started', async () => {
-    const getSenderAccount = new GetSenderAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+      getSenderAccount,
+    } = makeSut(0);
 
     await waitFor(() => {
       expect(result.current.senderAccount).toEqual(
@@ -40,18 +41,10 @@ describe('Presentation: useTransferMoney', () => {
   });
 
   test('should get recipientAccount by GetRecipientAccount when started', async () => {
-    const getSenderAccount = new GetSenderAccountFaker();
-
-    const getRecipientAccount = new GetRecipientAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount,
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+      getRecipientAccount,
+    } = makeSut(0);
 
     await waitFor(() => {
       expect(result.current.recipientAccount).toEqual(
@@ -62,18 +55,12 @@ describe('Presentation: useTransferMoney', () => {
 
   test('should show alert when call get of GetSenderAccount returning a error exception', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getSenderAccount = new GetSenderAccountFaker();
-    getSenderAccount.completeGetWithError();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+    } = makeSut(0, () => {}, {
+      completeWithError: true,
+      isDifferentError: false,
+    });
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -83,28 +70,14 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
 
-    expect(result.current.senderAccount).toEqual({
-      agency: '',
-      currentAccount: '',
-      profilePhoto: '',
-      userName: '',
-    });
+    expect(result.current.senderAccount).toEqual(emptyAccount);
   });
 
   test('should show alert when call get of GetSenderAccount returning a error different of GetSenderAccountError', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getSenderAccount = new GetSenderAccountFaker();
-    getSenderAccount.completeGetWithError(true);
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+    } = makeSut(0, () => {}, {completeWithError: true, isDifferentError: true});
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -114,28 +87,16 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
 
-    expect(result.current.senderAccount).toEqual({
-      agency: '',
-      currentAccount: '',
-      profilePhoto: '',
-      userName: '',
-    });
+    expect(result.current.senderAccount).toEqual(emptyAccount);
   });
 
   test('should show alert when call get of GetRecipientAccount returning a error exception', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getRecipientAccount = new GetRecipientAccountFaker();
+    const {
+      sut: {result},
+      getRecipientAccount,
+    } = makeSut(0);
     getRecipientAccount.completeGetWithError();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
-      }),
-    );
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -145,28 +106,16 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
 
-    expect(result.current.recipientAccount).toEqual({
-      agency: '',
-      currentAccount: '',
-      profilePhoto: '',
-      userName: '',
-    });
+    expect(result.current.recipientAccount).toEqual(emptyAccount);
   });
 
   test('should show alert when call get of GetRecipientAccount returning a error different of GetRecipientAccountError', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getRecipientAccount = new GetRecipientAccountFaker();
+    const {
+      sut: {result},
+      getRecipientAccount,
+    } = makeSut(0);
     getRecipientAccount.completeGetWithError(true);
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
-      }),
-    );
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -176,26 +125,13 @@ describe('Presentation: useTransferMoney', () => {
       );
     });
 
-    expect(result.current.recipientAccount).toEqual({
-      agency: '',
-      currentAccount: '',
-      profilePhoto: '',
-      userName: '',
-    });
+    expect(result.current.recipientAccount).toEqual(emptyAccount);
   });
 
   test('should update isLoading to false when finish call get sender and recipient accounts', async () => {
-    const getSenderAccount = new GetSenderAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer: 0,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
-
+    const {
+      sut: {result},
+    } = makeSut(0);
     expect(result.current.isLoading).toEqual(true);
 
     await waitFor(() => {
@@ -205,72 +141,63 @@ describe('Presentation: useTransferMoney', () => {
 
   test('should get amountToTransfer in correct pattern', async () => {
     const amountToTransfer = Number(faker.commerce.price());
-    const getSenderAccount = new GetSenderAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+    } = makeSut(amountToTransfer);
 
     expect(result.current.amountToTransfer).toEqual(`R$ ${amountToTransfer}`);
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
   });
 
   test('should get amountToTransfer in correct pattern when undefined', async () => {
     const amountToTransfer = undefined as unknown as number;
-    const getSenderAccount = new GetSenderAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: getSenderAccount,
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney: new SendMoneySpy(getSenderAccount.senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+    } = makeSut(amountToTransfer);
 
     expect(result.current.amountToTransfer).toEqual(`R$ 0`);
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
   });
 
   test('should call navigateTo function with correct param when call recipientAccountChange', async () => {
     const navigateTo = jest.fn();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount: new GetRecipientAccountFaker(),
-        amountToTransfer: 0,
-        navigateTo,
-        sendMoney: new SendMoneySpy(new GetSenderAccountFaker().senderAccount),
-      }),
-    );
+    const {
+      sut: {result},
+    } = makeSut(0, navigateTo);
 
     result.current.recipientAccountChange();
 
     expect(navigateTo).toHaveBeenLastCalledWith('RecipientAccountChange');
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
   });
 
   test('should send money to recipient account through of SendMoney when call sendMoney function', async () => {
-    const sendMoney = new SendMoneySpy(
-      new GetSenderAccountFaker().senderAccount,
-    );
-
     const amountToTransfer = Number(faker.commerce.price());
-    const getRecipientAccount = new GetRecipientAccountFaker();
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney,
-      }),
-    );
+    const {
+      sut: {result},
+      getRecipientAccount,
+      sendMoney,
+    } = makeSut(amountToTransfer);
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toEqual(false);
+    });
 
     const recipientAccount = await getRecipientAccount.get();
-    result.current.sendMoney(recipientAccount, amountToTransfer);
+
+    await waitFor(() => {
+      result.current.sendMoney(recipientAccount, amountToTransfer);
+      expect(result.current.isLoading).toEqual(false);
+    });
 
     expect(sendMoney.called).toEqual(1);
     expect(sendMoney.calledWith).toEqual({
@@ -281,23 +208,14 @@ describe('Presentation: useTransferMoney', () => {
 
   test('should show alert when call sendTo of SendMoney returning a error exception', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getRecipientAccount = new GetRecipientAccountFaker();
-    const sendMoney = new SendMoneySpy(
-      new GetSenderAccountFaker().senderAccount,
-    );
-    sendMoney.completeSendToWithError();
     const amountToTransfer = Number(faker.commerce.price());
 
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney,
-      }),
-    );
+    const {
+      sut: {result},
+      sendMoney,
+      getRecipientAccount,
+    } = makeSut(amountToTransfer);
+    sendMoney.completeSendToWithError();
 
     result.current.sendMoney(
       getRecipientAccount.recipientAccount,
@@ -315,23 +233,14 @@ describe('Presentation: useTransferMoney', () => {
 
   test('should show alert when call sendTo of SendMoney returning error different of SendMoneyError', async () => {
     jest.spyOn(Alert, 'alert');
-
-    const getRecipientAccount = new GetRecipientAccountFaker();
-    const sendMoney = new SendMoneySpy(
-      new GetSenderAccountFaker().senderAccount,
-    );
-    sendMoney.completeSendToWithError(true);
     const amountToTransfer = Number(faker.commerce.price());
 
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney,
-      }),
-    );
+    const {
+      sut: {result},
+      getRecipientAccount,
+      sendMoney,
+    } = makeSut(amountToTransfer);
+    sendMoney.completeSendToWithError(true);
 
     result.current.sendMoney(
       getRecipientAccount.recipientAccount,
@@ -348,20 +257,11 @@ describe('Presentation: useTransferMoney', () => {
   });
 
   test('should update isLoading to false when finish call send money', async () => {
-    const getRecipientAccount = new GetRecipientAccountFaker();
-    const sendMoney = new SendMoneySpy(
-      new GetSenderAccountFaker().senderAccount,
-    );
     const amountToTransfer = Number(faker.commerce.price());
-    const {result} = renderHook(() =>
-      useTransferMoney({
-        getSenderAccount: new GetSenderAccountFaker(),
-        getRecipientAccount,
-        amountToTransfer,
-        navigateTo: () => {},
-        sendMoney,
-      }),
-    );
+    const {
+      sut: {result},
+      getRecipientAccount,
+    } = makeSut(amountToTransfer);
 
     result.current.sendMoney(
       getRecipientAccount.recipientAccount,
@@ -373,6 +273,38 @@ describe('Presentation: useTransferMoney', () => {
     });
   });
 });
+
+const makeSut = (
+  amountToTransfer: number,
+  navigateTo = () => {},
+  getSenderAccountError = {
+    completeWithError: false,
+    isDifferentError: false,
+  },
+) => {
+  const getRecipientAccount = new GetRecipientAccountFaker();
+  const getSenderAccount = new GetSenderAccountFaker();
+
+  if (getSenderAccountError.completeWithError) {
+    getSenderAccount.completeGetWithError(
+      getSenderAccountError.isDifferentError,
+    );
+  }
+
+  const sendMoney = new SendMoneySpy(new GetSenderAccountFaker().senderAccount);
+
+  const sut = renderHook(() =>
+    useTransferMoney({
+      getSenderAccount,
+      getRecipientAccount,
+      amountToTransfer,
+      navigateTo,
+      sendMoney,
+    }),
+  );
+
+  return {sut, getRecipientAccount, getSenderAccount, sendMoney};
+};
 
 class SendMoneySpy implements SendMoney {
   called = 0;
